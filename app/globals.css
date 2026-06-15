@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Fredoka:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --cream: #f4ecd4;
+  --cream-2: #fbf6e6;
+  --paper: #fffdf6;
+  --ink: #1c1b19;
+  --muted: #6b6657;
+  --faint: #9c9684;
+
+  --orange: #ef7d2a;
+  --orange-2: #f6a02b;
+  --yellow: #f4bd2f;
+  --pink: #f3a3c6;
+  --pink-strong: #ee83b2;
+  --green: #4fae5a;
+  --red: #e85c4a;
+
+  --border: var(--ink);
+  --shadow: 4px 4px 0 var(--ink);
+  --shadow-sm: 3px 3px 0 var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--yellow);
+  color: var(--ink);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--orange);
+  border-radius: 8px;
+  border: 3px solid var(--cream);
+}
+
+/* ── display / sticker type ───────────────────────────── */
+.display {
+  font-family: 'Bagel Fat One', 'Fredoka', cursive;
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+}
+.hero-sticker {
+  color: var(--ink);
+  text-shadow: -2px -2px 0 var(--paper), 2px -2px 0 var(--paper), -2px 2px 0 var(--paper),
+    2px 2px 0 var(--paper), 0 3px 0 var(--paper), 4px 6px 0 rgba(28, 27, 25, 0.16);
+}
+
+/* ── building blocks ──────────────────────────────────── */
+.tp-card {
+  background: var(--paper);
+  border: 2.5px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+.tp-soft {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+}
+
+.tp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  padding: 11px 22px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
+}
+.tp-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.tp-btn--pink { background: var(--pink); }
+.tp-btn--orange { background: var(--orange); }
+.tp-btn--yellow { background: var(--yellow); }
+.tp-btn--green { background: var(--green); color: var(--paper); }
+.tp-btn--ink { background: var(--ink); color: var(--paper); }
+.tp-btn--sm { padding: 7px 14px; font-size: 13px; box-shadow: 2px 2px 0 var(--ink); }
+
+.tp-input {
+  width: 100%;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+}
+.tp-input::placeholder { color: var(--faint); }
+.tp-input:focus { box-shadow: var(--shadow-sm); }
+
+.tp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-weight: 600;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.tp-tag {
+  display: inline-block;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 4px 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
