@@ -17,7 +17,7 @@ export const ARCSCAN = "https://testnet.arcscan.app";
 export const ARC_NETWORK_PARAMS = {
   chainId: ARC_CHAIN_HEX,
   chainName: "ARC Testnet",
-  nativeCurrency: { name: "ARC", symbol: "ARC", decimals: 18 },
+  nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
   rpcUrls: [ARC_RPC],
   blockExplorerUrls: [ARCSCAN],
 };

@@ -36,7 +36,7 @@ export default function PingCard({ ping, me, busyId, msg, onConfirm, onDecline, 
           </span>
           {ping.bounty > 0n && (
             <span className="tp-pill" style={{ flexShrink: 0, background: "var(--orange-2)", color: "var(--ink)" }}>
-              {fmtArc(ping.bounty)} ARC
+              {fmtArc(ping.bounty)} USDC
             </span>
           )}
         </div>

@@ -54,7 +54,7 @@ export default function Header({ account, balance, chainOk, connecting, onConnec
                 </button>
               )}
               <span className="tp-pill" style={{ background: "var(--paper)", padding: "6px 12px" }}>
-                <span style={{ color: "var(--muted)", fontWeight: 600 }}>{balance || "0"} ARC</span>
+                <span style={{ color: "var(--muted)", fontWeight: 600 }}>{balance || "0"} USDC</span>
                 <span style={{ width: 2, height: 14, background: "var(--ink)", opacity: 0.2 }} />
                 <a
                   href={`${ARCSCAN}/address/${account}`}
