@@ -3,51 +3,9 @@ import { ARC_RPC } from "./arcNetwork";
 
 // ─────────────────────────────────────────────────────────────
 // TaskPing — on-chain task confirmations on ARC Testnet.
-//
-// The contract address is resolved at runtime: a per-browser override
-// (set by the /deploy console) takes priority, falling back to the baked
-// default. This lets anyone point the app at their own deployed instance
-// without touching the code.
+// One deployed, verified contract — the single source of truth.
 // ─────────────────────────────────────────────────────────────
-export const DEFAULT_CONTRACT_ADDRESS = "0x2F3aC4dBAbe43f4E14bE8DE7e331f2D4DE35A7C3";
-const LS_KEY = "taskping.contract";
-
-export function getContractAddress(): string {
-  if (typeof window !== "undefined") {
-    try {
-      const o = window.localStorage.getItem(LS_KEY);
-      if (o && ethers.isAddress(o)) return ethers.getAddress(o);
-    } catch {
-      /* ignore */
-    }
-  }
-  return DEFAULT_CONTRACT_ADDRESS;
-}
-
-export function setContractAddress(addr: string) {
-  if (typeof window !== "undefined") {
-    try {
-      window.localStorage.setItem(LS_KEY, ethers.getAddress(addr));
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
-export function clearContractAddress() {
-  if (typeof window !== "undefined") {
-    try {
-      window.localStorage.removeItem(LS_KEY);
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
-export function isConfigured(addr?: string): boolean {
-  const a = addr ?? getContractAddress();
-  return ethers.isAddress(a) && a.toLowerCase() !== ethers.ZeroAddress.toLowerCase();
-}
+export const CONTRACT_ADDRESS = "0x2F3aC4dBAbe43f4E14bE8DE7e331f2D4DE35A7C3";
 
 export const TASKPING_ABI = [
   "function pingCount() view returns (uint256)",
@@ -98,8 +56,8 @@ export function readProvider() {
   return new ethers.JsonRpcProvider(ARC_RPC);
 }
 
-export function readContract(address?: string, provider?: ethers.Provider) {
-  return new ethers.Contract(address ?? getContractAddress(), TASKPING_ABI, provider ?? readProvider());
+export function readContract(provider?: ethers.Provider) {
+  return new ethers.Contract(CONTRACT_ADDRESS, TASKPING_ABI, provider ?? readProvider());
 }
 
 async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
