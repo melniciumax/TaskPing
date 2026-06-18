@@ -110,9 +110,19 @@ export default function Header({ account, balance, chainOk, connecting, onConnec
               </a>
             </>
           ) : (
-            <button onClick={onConnect} disabled={connecting} className="tp-btn tp-btn--amber">
-              {connecting ? "Connecting…" : "Connect wallet"}
-            </button>
+            (() => {
+              const walletLabel = connecting ? "Pairing…" : "Pair wallet";
+              return (
+                <button
+                  type="button"
+                  onClick={onConnect}
+                  disabled={connecting}
+                  className="tp-btn tp-btn--amber"
+                >
+                  {walletLabel}
+                </button>
+              );
+            })()
           )}
         </div>
       </div>

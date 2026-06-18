@@ -1,3 +1,5 @@
+import { pickProvider, type Eip1193Provider } from "./wallet";
+
 declare global {
   interface Window {
     ethereum?: {
@@ -8,12 +10,13 @@ declare global {
   }
 }
 
-// ARC Testnet network config
+// --- ARC Testnet chain configuration ---------------------------------------
 export const ARC_CHAIN_ID = 5042002;
 export const ARC_CHAIN_HEX = "0x" + ARC_CHAIN_ID.toString(16);
 export const ARC_RPC = "https://rpc.testnet.arc.network";
 export const ARCSCAN = "https://testnet.arcscan.app";
 
+// Payload handed to wallet_addEthereumChain.
 export const ARC_NETWORK_PARAMS = {
   chainId: ARC_CHAIN_HEX,
   chainName: "ARC Testnet",
@@ -22,27 +25,25 @@ export const ARC_NETWORK_PARAMS = {
   blockExplorerUrls: [ARCSCAN],
 };
 
-import { pickProvider, type Eip1193Provider } from "./wallet";
-
 /**
- * Adds ARC Testnet to the wallet (if not present) and switches to it.
- * Operates on the supplied provider, or the best discovered one (Rabby first).
+ * Make sure ARC Testnet exists in the wallet, then switch to it. Works against
+ * a provider you pass in, or otherwise the best discovered one (Rabby first).
  */
 export async function switchToArc(provider?: Eip1193Provider): Promise<void> {
   const eth = provider ?? pickProvider();
   if (!eth) throw new Error("No wallet detected");
 
-  // First try to add the network (safe to call even if already added)
+  // Adding first is harmless even when the chain is already registered.
   try {
     await eth.request({
       method: "wallet_addEthereumChain",
       params: [ARC_NETWORK_PARAMS],
     });
   } catch {
-    // Some wallets throw if chain already exists — ignore
+    // Certain wallets reject a duplicate add — that's fine, keep going.
   }
 
-  // Then force switch
+  // Now make ARC the active chain.
   await eth.request({
     method: "wallet_switchEthereumChain",
     params: [{ chainId: ARC_CHAIN_HEX }],

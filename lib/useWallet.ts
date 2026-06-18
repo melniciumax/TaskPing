@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
-import { ARC_RPC, ARC_CHAIN_HEX, switchToArc } from "./arcNetwork";
-import { ensureDiscovered, pickProvider, pickDetail, setChosenRdns } from "./wallet";
+import { useCallback, useEffect, useState } from "react";
+
+import { ensureDiscovered, pickDetail, pickProvider, setChosenRdns } from "./wallet";
+import { ARC_CHAIN_HEX, ARC_RPC, switchToArc } from "./arcNetwork";
 
 /**
- * Single source of truth for wallet state. Discovers wallets via EIP-6963
- * (Rabby first), pins the chosen one, and uses that same provider for reads,
- * writes and events. The page owns this state and feeds it to the header.
+ * The one place wallet state lives. Wallets are discovered through EIP-6963
+ * (Rabby gets first dibs), the chosen one is pinned, and that exact provider
+ * backs every read, write and event afterwards. The page holds this hook and
+ * hands the pieces down to the header.
  */
 export function useWallet() {
   const [account, setAccount] = useState("");
@@ -16,11 +18,12 @@ export function useWallet() {
   const [chainOk, setChainOk] = useState(false);
   const [connecting, setConnecting] = useState(false);
 
+  // Read the native (USDC) balance straight off the RPC, not the wallet.
   const refreshBalance = useCallback(async (addr: string) => {
     try {
-      const p = new ethers.JsonRpcProvider(ARC_RPC);
-      const b = await p.getBalance(addr);
-      setBalance(parseFloat(ethers.formatEther(b)).toFixed(3));
+      const rpc = new ethers.JsonRpcProvider(ARC_RPC);
+      const raw = await rpc.getBalance(addr);
+      setBalance(parseFloat(ethers.formatEther(raw)).toFixed(3));
     } catch {
       setBalance("—");
     }
@@ -29,16 +32,17 @@ export function useWallet() {
   const connect = useCallback(async () => {
     await ensureDiscovered();
     const detail = pickDetail();
-    const inj = detail?.provider;
-    if (!inj) return;
-    setChosenRdns(detail.rdns); // pin this wallet for all later calls
+    const injected = detail?.provider;
+    if (!injected) return;
+
+    setChosenRdns(detail.rdns); // remember this wallet for every later call
     setConnecting(true);
     try {
-      const accs = (await inj.request({ method: "eth_requestAccounts" })) as string[];
+      const accs = (await injected.request({ method: "eth_requestAccounts" })) as string[];
       setAccount(accs[0]);
-      await switchToArc(inj);
+      await switchToArc(injected);
       try {
-        const id = (await inj.request({ method: "eth_chainId" })) as string;
+        const id = (await injected.request({ method: "eth_chainId" })) as string;
         setChainOk(id.toLowerCase() === ARC_CHAIN_HEX.toLowerCase());
       } catch {
         setChainOk(false);
@@ -51,18 +55,22 @@ export function useWallet() {
     }
   }, [refreshBalance]);
 
+  // Reconnect silently on mount and keep account/chain state in sync with the
+  // wallet's own events.
   useEffect(() => {
-    let cleanup = () => {};
+    let teardown = () => {};
+
     (async () => {
       await ensureDiscovered();
-      const inj = pickProvider();
-      if (!inj) return;
+      const injected = pickProvider();
+      if (!injected) return;
+
       try {
-        const accs = (await inj.request({ method: "eth_accounts" })) as string[];
+        const accs = (await injected.request({ method: "eth_accounts" })) as string[];
         if (accs.length) {
           setAccount(accs[0]);
           refreshBalance(accs[0]);
-          inj
+          injected
             .request({ method: "eth_chainId" })
             .then((id) => setChainOk((id as string).toLowerCase() === ARC_CHAIN_HEX.toLowerCase()))
             .catch(() => {});
@@ -70,8 +78,10 @@ export function useWallet() {
       } catch {
         /* ignore */
       }
-      if (!inj.on) return;
-      const onAcc = (a: unknown) => {
+
+      if (!injected.on) return;
+
+      const handleAccounts = (a: unknown) => {
         const list = a as string[];
         if (list.length) {
           setAccount(list[0]);
@@ -82,16 +92,18 @@ export function useWallet() {
           setChainOk(false);
         }
       };
-      const onChain = (c: unknown) =>
+      const handleChain = (c: unknown) =>
         setChainOk((c as string).toLowerCase() === ARC_CHAIN_HEX.toLowerCase());
-      inj.on("accountsChanged", onAcc);
-      inj.on("chainChanged", onChain);
-      cleanup = () => {
-        inj.removeListener?.("accountsChanged", onAcc);
-        inj.removeListener?.("chainChanged", onChain);
+
+      injected.on("accountsChanged", handleAccounts);
+      injected.on("chainChanged", handleChain);
+      teardown = () => {
+        injected.removeListener?.("accountsChanged", handleAccounts);
+        injected.removeListener?.("chainChanged", handleChain);
       };
     })();
-    return () => cleanup();
+
+    return () => teardown();
   }, [refreshBalance]);
 
   return { account, balance, chainOk, connecting, connect, refreshBalance };
