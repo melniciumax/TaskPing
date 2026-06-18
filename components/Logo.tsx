@@ -1,8 +1,27 @@
-export default function Logo({ size = 36 }: { size?: number }) {
+// Bespoke TaskPing mark: a "ping" ripple radiating from a confirm check.
+// Pure SVG, themeable via the `tone` prop. No rounded-rect tile / brand art.
+export default function Logo({ size = 36, tone = "amber" }: { size?: number; tone?: "amber" | "light" }) {
+  const grad = tone === "light" ? "url(#tpLight)" : "url(#tpAmber)";
+  const ripple = tone === "light" ? "rgba(255,255,255,0.55)" : "var(--amber)";
+  const check = "#fff";
   return (
-    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <rect x="13" y="13" width="230" height="230" rx="66" fill="#ef7d2a" stroke="#1c1b19" strokeWidth="11" />
-      <path d="M76 134 L114 172 L184 90" stroke="#fffdf6" strokeWidth="26" strokeLinecap="round" strokeLinejoin="round" />
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="tpAmber" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#f6a44f" />
+          <stop offset="1" stopColor="#e0782a" />
+        </linearGradient>
+        <linearGradient id="tpLight" x1="6" y1="6" x2="42" y2="42" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#ffffff" />
+          <stop offset="1" stopColor="#fbe3c6" />
+        </linearGradient>
+      </defs>
+      {/* radiating ping ripples */}
+      <path d="M37.5 10.5 A19 19 0 0 1 37.5 37.5" stroke={ripple} strokeWidth="2.4" strokeLinecap="round" opacity="0.45" />
+      <path d="M33 14 A13 13 0 0 1 33 34" stroke={ripple} strokeWidth="2.4" strokeLinecap="round" opacity="0.7" />
+      {/* confirm dot */}
+      <circle cx="20" cy="24" r="13" fill={grad} />
+      <path d="M14.5 24.5 L18.5 28.5 L26 19.5" stroke={check} strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

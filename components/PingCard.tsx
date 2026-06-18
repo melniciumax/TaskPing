@@ -27,56 +27,56 @@ export default function PingCard({ ping, me, busyId, msg, onConfirm, onDecline, 
   const busy = busyId === ping.id;
 
   return (
-    <div className="tp-soft" style={{ padding: "14px 16px" }}>
+    <div className="tp-soft tp-lift" style={{ padding: "15px 17px", background: "var(--card)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 5 }}>
-          <span style={{ fontSize: 15.5, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {ping.title}
-          </span>
-          {ping.bounty > 0n && (
-            <span className="tp-pill" style={{ flexShrink: 0, background: "var(--orange-2)", color: "var(--ink)" }}>
-              {fmtArc(ping.bounty)} USDC
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 6 }}>
+            <span style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", letterSpacing: "-0.01em" }}>
+              {ping.title}
             </span>
+            {ping.bounty > 0n && (
+              <span className="tp-pill tnum" style={{ flexShrink: 0, background: "var(--amber-soft)", color: "var(--amber-deep)" }}>
+                {fmtArc(ping.bounty)} USDC
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize: 12.5, color: "var(--muted)", fontWeight: 500 }}>
+            <a href={`${ARCSCAN}/address/${ping.from}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--slate-2)", textDecoration: "none", fontWeight: 600 }}>
+              {party(ping.from, me)}
+            </a>
+            <span style={{ margin: "0 6px", color: "var(--faint)" }}>→</span>
+            <a href={`${ARCSCAN}/address/${ping.to}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--slate-2)", textDecoration: "none", fontWeight: 600 }}>
+              {party(ping.to, me)}
+            </a>
+            <span style={{ margin: "0 7px", color: "var(--faint)" }}>·</span>
+            {timeAgo(pending ? ping.createdAt : ping.resolvedAt || ping.createdAt)}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          {pending && iAmAssignee ? (
+            <>
+              <button onClick={() => onDecline(ping.id)} disabled={busy} className="tp-btn tp-btn--sm tp-btn--ghost">
+                Decline
+              </button>
+              <button onClick={() => onConfirm(ping.id)} disabled={busy} className="tp-btn tp-btn--sm tp-btn--green">
+                {busy ? "…" : "Confirm"}
+              </button>
+            </>
+          ) : pending && iAmRequester ? (
+            <>
+              <StatusBadge status={ping.status} />
+              <button onClick={() => onCancel(ping.id)} disabled={busy} className="tp-btn tp-btn--sm tp-btn--ghost">
+                {busy ? "…" : "Cancel"}
+              </button>
+            </>
+          ) : (
+            <StatusBadge status={ping.status} />
           )}
         </div>
-        <div style={{ fontSize: 13, color: "var(--muted)", fontWeight: 500 }}>
-          <a href={`${ARCSCAN}/address/${ping.from}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--muted)", textDecoration: "none", fontWeight: 600 }}>
-            {party(ping.from, me)}
-          </a>
-          {" → "}
-          <a href={`${ARCSCAN}/address/${ping.to}`} target="_blank" rel="noopener noreferrer" style={{ color: "var(--muted)", textDecoration: "none", fontWeight: 600 }}>
-            {party(ping.to, me)}
-          </a>
-          <span style={{ margin: "0 7px", color: "var(--faint)" }}>·</span>
-          {timeAgo(pending ? ping.createdAt : ping.resolvedAt || ping.createdAt)}
-        </div>
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-        {pending && iAmAssignee ? (
-          <>
-            <button onClick={() => onDecline(ping.id)} disabled={busy} className="tp-btn tp-btn--sm">
-              Decline
-            </button>
-            <button onClick={() => onConfirm(ping.id)} disabled={busy} className="tp-btn tp-btn--sm tp-btn--green">
-              {busy ? "…" : "Confirm"}
-            </button>
-          </>
-        ) : pending && iAmRequester ? (
-          <>
-            <StatusBadge status={ping.status} />
-            <button onClick={() => onCancel(ping.id)} disabled={busy} className="tp-btn tp-btn--sm">
-              {busy ? "…" : "Cancel"}
-            </button>
-          </>
-        ) : (
-          <StatusBadge status={ping.status} />
-        )}
-      </div>
       </div>
       {msg && (
-        <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 8, color: msg.startsWith("✓") ? "var(--green)" : msg.startsWith("✗") ? "var(--red)" : "var(--muted)" }}>
+        <div style={{ fontSize: 12.5, fontWeight: 600, marginTop: 9, color: msg.startsWith("✓") ? "var(--green)" : msg.startsWith("✗") ? "var(--red)" : "var(--muted)" }}>
           {msg}
         </div>
       )}
